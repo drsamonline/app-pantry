@@ -14,6 +14,7 @@ app works in.**
 | | |
 |---|---|
 | **Built** | Inventory (name, quantity, unit, place, expiry) with every refusal naming its field; a "use first" order where a past date sorts to the top; a shopping list built from what is finished; bulk paste with bad lines listed; nine locked rules (four allergies, Jain, no onion-garlic, two fasts, diabetic); a bundled twelve-dish index matched strictly against the pantry; a "why this fits your rules" note; Markdown export; corruption reported, never reset. |
+| **Release** | Windows EXE, Android APK and Linux binary, built from this source by `app-builder` in CI, attached to the rolling release: [app-latest](https://github.com/drsamonline/app-pantry/releases/tag/app-latest) |
 | **Not built** | **Reading ingredients from a photo** — that needs an on-device vision model and this build ships none. **Any model or key** — the dish list is fixed, small and offline; the Palate prompt's LLM path is deliberately not built, because the house rule forbids a runtime network call. A packaged EXE / APK release. |
 | **Untested** | The service worker and install prompt (jsdom implements neither), and the app on a real phone with a real pantry of 60+ items — the ordering is tested, the feel of a long list is not. |
 
