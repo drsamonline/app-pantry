@@ -1,0 +1,15 @@
+{
+  "name": "app-pantry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pantry and fridge inventory where expiry drives the order, the shopping list is built from what is gone, and a dish is only suggested if your rules and your pantry allow it.",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "author": "Dr Sohil Momin",
+  "scripts": {
+    "test": "node tests/self-tests.js && node tests/page-smoke.js && node tests/ui-tests.js",
+    "test:engine": "node tests/self-tests.js",
+    "test:shape": "node tests/page-smoke.js",
+    "test:ui": "node tests/ui-tests.js"
+  },
+  "devDependencies": { "jsdom": "^24.0.0" }
+}

@@ -1,0 +1,26 @@
+NOTICE
+======
+
+Pantry — https://github.com/drsamonline/app-pantry
+Copyright 2026 Dr Sohil Momin. Licensed under PolyForm Noncommercial 1.0.0 (see LICENSE).
+
+Third-party components
+----------------------
+
+None. Pantry has no third-party dependency and no CDN.
+
+Vendored from this project's own kits (same licence, same author), copied verbatim
+on 25/11/2026:
+
+- web-kit 0.1.0 — docs/play/web-kit.js — the offline shell, storage helpers and PWA registration
+- export-kit 1.0.0 — docs/play/export-kit.js — Blob download, used to write the export
+
+Neither kit is modified. Neither makes a network request.
+
+On the bundled dish index
+-------------------------
+
+The twelve dishes in docs/play/larder-core.js are ordinary Indian home dishes with their
+usual ingredients. They are an app's content, not a claim about nutrition, health or
+suitability for any medical condition — the app says so wherever it explains why a dish
+fits your rules. No recipe, statistic or health claim is attributed to any source.

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantry — what you have, what goes first, what to buy</title>
+<meta name="description" content="Pantry and fridge inventory where expiry drives the order, the shopping list is built from what is gone, and a dish is only suggested if your rules and your pantry both allow it. Offline, on device.">
+<meta name="theme-color" content="#101418">
+<style>
+  :root{--bg:#f6f5f2;--panel:#fff;--ink:#14181d;--muted:#5d666f;--line:#d9d6cf;--accent:#1f5f4f}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+  main{max-width:780px;margin:0 auto;padding:48px 20px 64px}
+  h1{font-size:34px;line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
+  .lede{font-size:18px;color:var(--muted);margin:0 0 26px}
+  .cta{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:9px}
+  .status{margin:26px 0;padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;background:var(--panel);font-size:14px}
+  .status b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+  h2{font-size:17px;margin:30px 0 8px}
+  ul{padding-left:20px}li{margin:4px 0}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;background:#eeede9;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}
+  th,td{text-align:left;border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Pantry</h1>
+  <p class="lede">What you have, what goes first, what to buy. Expiry is not a column here — it is the order the app works in.</p>
+
+  <a class="cta" href="play/index.html">Open Pantry</a>
+
+  <div class="status">
+    <b>Status</b>
+    Built and working offline: items with quantity, unit, place and expiry; a “use first” list ordered by expiry (a past
+    date sits at the top, which is the mechanic, not an error); a shopping list built from what is finished; bulk paste;
+    locked rules (allergies, Jain, no onion-garlic, Ekadashi and Navratri fasts, diabetic); and a small bundled dish index
+    matched <em>strictly</em> against the pantry.
+    <br><b>Not built</b>: reading ingredients from a photo (that needs an on-device vision model, which this build does not
+    ship), and any model or key — the dish list is fixed, small and offline. A packaged EXE / APK release is also not built.
+  </div>
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Orders by expiry, so what is about to go is at the top — a past date first of all.</li>
+    <li>Builds the shopping list from what is finished, plus what you add by hand. Nothing else.</li>
+    <li>Filters a small bundled dish index against rules you set once, and shows those rules as locked chips.</li>
+    <li>Matches dishes <strong>strictly</strong>: an ingredient you do not have is named, never swapped for something similar.</li>
+    <li>Says why a dish fits your rules — and says plainly that this is not a nutritional or medical judgement.</li>
+    <li>Keeps everything on the device and exports it as Markdown.</li>
+  </ul>
+
+  <h2>What it will not do</h2>
+  <ul>
+    <li><strong>Become a recipe app.</strong> The dishes are a fixed list of twelve; nothing is generated, composed or fetched.</li>
+    <li><strong>Substitute a near-miss.</strong> “Tomato ketchup” in the pantry does not satisfy “tomato” — a dish you cannot cook is worse than an honest gap.</li>
+    <li><strong>Use a model, a key or a network.</strong> No <code>fetch</code>, no endpoint, no API key; CSP <code>connect-src 'none'</code>.</li>
+    <li><strong>Reset your pantry when the saved file is unreadable.</strong> It reports it and offers an export, because an empty pantry would also empty the shopping list built from it.</li>
+  </ul>
+
+  <h2>When things go wrong</h2>
+  <table>
+    <tr><th>Case</th><th>What happens</th></tr>
+    <tr><td>Bad input</td><td>An item with no name, or a quantity that is not a number, is refused with the field named. A date in the past is accepted and goes to the top of “use first”.</td></tr>
+    <tr><td>No network</td><td>Nothing changes — the inventory, the list and the dishes are on the device.</td></tr>
+    <tr><td>Storage full or unavailable</td><td>The item is not added, the failure is announced, and it does not reach the shopping list.</td></tr>
+    <tr><td>Corrupt saved state</td><td>Reported rather than reset, with an export of the unreadable file and an explicit “start an empty pantry”.</td></tr>
+  </table>
+
+  <h2>How to run it</h2>
+  <ul>
+    <li><strong>Here</strong>: <a href="play/index.html">play/index.html</a>, or install it from your browser's menu.</li>
+    <li><strong>Offline file</strong>: open <code>docs/play/index.html</code> straight from disk.</li>
+    <li><strong>Tests</strong>: <code>node tests/self-tests.js</code> — the spec's “done means” (past date at the top, and still there after a reload) is asserted there.</li>
+  </ul>
+
+  <footer>
+    PolyForm Noncommercial 1.0.0 · (c) 2026 Dr Sohil Momin ·
+    <a href="https://github.com/drsamonline/app-pantry">source</a>
+  </footer>
+</main>
+</body>
+</html>

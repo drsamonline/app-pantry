@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantry — what you have, what goes first, what to buy</title>
+<meta name="description" content="Pantry and fridge inventory where expiry drives the workflow: what is about to go is at the top, the shopping list is built from what is gone, and a dish is only suggested if the rules you set and the pantry you actually have both allow it.">
+<meta name="theme-color" content="#101418">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{--bg:#f6f5f2;--panel:#fff;--ink:#14181d;--muted:#5d666f;--line:#d9d6cf;--accent:#1f5f4f;--accent-ink:#fff;
+        --past:#a02a2a;--today:#8a5a00;--soon:#8a5a00;--later:#5d666f;--ok:#1f5f4f;
+        --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+        --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;font-size:16px}
+  header.top{border-bottom:1px solid var(--line);background:var(--panel);padding:14px 20px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  header.top h1{font-size:18px;margin:0;letter-spacing:-.01em}
+  header.top p{margin:0;color:var(--muted);font-size:13px}
+  header.top a{margin-left:auto;color:var(--accent);font-size:13px;text-decoration:none;border-bottom:1px solid currentColor}
+  main{max-width:1080px;margin:0 auto;padding:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+  .tab{font:inherit;font-size:14px;padding:9px 14px;border:1px solid transparent;border-bottom:none;background:none;color:var(--muted);cursor:pointer;border-radius:8px 8px 0 0}
+  .tab[aria-selected="true"]{background:var(--panel);border-color:var(--line);color:var(--ink);font-weight:600;margin-bottom:-1px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  .card h2{font-size:15px;margin:0 0 6px}
+  .card p.claim{margin:0 0 8px;color:var(--muted);font-size:13px}
+  label.fld{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+  input[type=text],input[type=number],select,textarea{font:inherit;font-size:14px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:inherit}
+  textarea{font-family:var(--mono);font-size:13px;line-height:1.55;resize:vertical}
+  .grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+  button{font:inherit;font-size:13px;padding:8px 13px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+  button.small{padding:3px 8px;font-size:12px}
+  .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .bar .grow{flex:1}
+  .hint{color:var(--muted);font-size:12px}
+  .status{margin:10px 0;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);font-size:13px;display:none}
+  .status.show{display:block}
+  .status.bad{border-color:#e3b7b7;background:#fdf3f3;color:#7d1f1f}
+  .status.ok{border-color:#b7d8cd;background:#f2f9f6;color:#14503f}
+  .status.warn{border-color:#e8d5ae;background:#fdf8ee;color:#6b4700}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{text-align:left;border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:middle}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  tr.past td:first-child{border-left:4px solid var(--past);padding-left:10px}
+  tr.today td:first-child{border-left:4px solid var(--today);padding-left:10px}
+  tr.soon td:first-child{border-left:4px solid var(--soon);padding-left:10px}
+  tr.later td:first-child,tr.nodate td:first-child{border-left:4px solid transparent;padding-left:10px}
+  .tag{font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:2px 7px;border-radius:999px;background:#ecebe6;color:var(--muted)}
+  .tag.past{background:#fbe9e9;color:var(--past)}
+  .tag.today,.tag.soon{background:#fdf3e3;color:var(--soon)}
+  .tag.ok{background:#e4f1ea;color:var(--ok)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+  .chip{display:inline-flex;gap:6px;align-items:center;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;background:#fff;cursor:pointer}
+  .chip input{margin:0}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .dish{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:8px 0;background:#fbfaf8}
+  .dish h4{margin:0 0 4px;font-size:14px}
+  .dish .needs{font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .dish .why{font-size:12px;color:var(--muted);margin-top:6px}
+  .dish.locked{border-left:4px solid var(--past)}
+  .empty{text-align:center;color:var(--muted);padding:22px 14px;font-size:14px}
+  footer{max-width:1080px;margin:0 auto;padding:22px 20px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
+  [hidden]{display:none !important}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Pantry</h1>
+  <p>What you have, what goes first, what to buy. Expiry drives the order — and nothing is invented.</p>
+  <a href="../index.html">about</a>
+</header>
+
+<main>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-pantry" aria-selected="true" aria-controls="panel-pantry">Pantry</button>
+    <button class="tab" role="tab" id="tab-cook" aria-selected="false" aria-controls="panel-cook">Cook</button>
+  </div>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <!-- ------------------------------------------------------ the pantry -->
+  <div id="panel-pantry" role="tabpanel" aria-labelledby="tab-pantry">
+    <section class="card">
+      <h2>Add an item</h2>
+      <p class="claim">A past date is not an error here: it goes straight to the top of “use first”. That is the point of the app.</p>
+      <div class="grid3">
+        <div>
+          <label class="fld" for="iName">Item</label>
+          <input type="text" id="iName" placeholder="milk">
+        </div>
+        <div>
+          <label class="fld" for="iQty">Quantity</label>
+          <input type="text" id="iQty" placeholder="0.5">
+        </div>
+        <div>
+          <label class="fld" for="iUnit">Unit</label>
+          <select id="iUnit"></select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-top:10px">
+        <div>
+          <label class="fld" for="iExpires">Expires (dd/mm/yyyy, optional)</label>
+          <input type="text" id="iExpires" placeholder="26/11/2026">
+        </div>
+        <div>
+          <label class="fld" for="iPlace">Where</label>
+          <select id="iPlace"></select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="primary" type="button" id="iAdd" style="width:100%">Add to the pantry</button>
+        </div>
+      </div>
+      <div class="bar">
+        <span class="hint">Or paste a list, one item per line — “2 kg rice”.</span>
+      </div>
+      <textarea id="bulk" rows="3" placeholder="2 kg rice&#10;1 L milk&#10;500 g dal"></textarea>
+      <div class="bar">
+        <button type="button" id="bulkAdd">Add the pasted lines</button>
+        <button type="button" id="exportPantry">Export the pantry (.md)</button>
+        <span class="hint" id="exportNote"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Use first <small id="ufCount" style="color:var(--muted);font-weight:400"></small></h2>
+      <table id="ufTable">
+        <thead><tr><th>Item</th><th>Quantity</th><th>Where</th><th>Expires</th><th>State</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="ufEmpty">Nothing in the pantry yet. Add something above — a past date will sit at the top, which is the whole idea.</div>
+    </section>
+
+    <section class="card">
+      <h2>Shopping list <small style="color:var(--muted);font-weight:400">— built from what is finished</small></h2>
+      <ul id="shopList" style="font-size:14px;padding-left:18px;margin:8px 0 0"></ul>
+      <div class="bar">
+        <input type="text" id="extraName" placeholder="Add something by hand" style="max-width:280px">
+        <button type="button" id="extraAdd">Add</button>
+        <span class="hint">Only finished items and what you add by hand. Never a guess about your week.</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- --------------------------------------------------------- cook -->
+  <div id="panel-cook" role="tabpanel" aria-labelledby="tab-cook" hidden>
+    <section class="card">
+      <h2>Your rules <small style="color:#5d666f;font-weight:400">— set once, locked from then on</small></h2>
+      <p class="claim">A dish that breaks one of these is not offered at all, and the app says which rule it broke.
+        These are the rules you set, not medical advice.</p>
+      <div class="chips" id="constraintChips"></div>
+    </section>
+
+    <section class="card">
+      <h2>What you can cook now</h2>
+      <p class="claim">Matched strictly against the pantry. An ingredient you do not have is named, never swapped for something
+        similar — a dish you cannot cook is worse than an honest gap.</p>
+      <div id="readyList"></div>
+      <div class="empty" id="cookEmpty">Nothing is ready to cook from what is in the pantry right now.</div>
+      <h2 style="margin-top:16px" id="closeHead" hidden>One or two things short</h2>
+      <div id="closeList"></div>
+      <h2 style="margin-top:16px" id="lockedHead" hidden>Not offered, and why</h2>
+      <div id="lockedList"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Pantry keeps your inventory, its dates and your rules on this device. It is not a recipe generator: the dishes are a fixed,
+  small list, and a dish is only suggested when your rules and your pantry both allow it. Nothing is uploaded.
+  <br>PolyForm Noncommercial 1.0.0 · (c) 2026 Dr Sohil Momin
+</footer>
+
+<script src="web-kit.js"></script>
+<script src="export-kit.js"></script>
+<script src="larder-core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
