@@ -109,16 +109,16 @@
 
   function removeItem(id) {
     state.items = state.items.filter(function (it) { return it.id !== id; });
-    persist();
+    var saved = persist();
     render();
-    setStatus("ok", "Item removed.");
+    if (saved) setStatus("ok", "Item removed.");
   }
 
   function finishItem(id) {
     state.items.forEach(function (it) { if (it.id === id) it.qty = 0; });
-    persist();
+    var saved = persist();
     render();
-    setStatus("ok", "Marked finished. It is now on the shopping list, because the list is built from what is gone.");
+    if (saved) setStatus("ok", "Marked finished. It is now on the shopping list, because the list is built from what is gone.");
   }
 
   /* ------------------------------------------------------------- render */
@@ -184,10 +184,10 @@
       input.addEventListener("change", function () {
         if (input.checked) { if (state.constraints.indexOf(c.id) < 0) state.constraints.push(c.id); }
         else state.constraints = state.constraints.filter(function (id) { return id !== c.id; });
-        persist();
+        var saved = persist();
         renderConstraints();
         renderCook();
-        setStatus("ok", c.label + (input.checked ? " is now a locked rule." : " is no longer a rule."));
+        if (saved) setStatus("ok", c.label + (input.checked ? " is now a locked rule." : " is no longer a rule."));
       });
       lab.appendChild(input);
       lab.appendChild(document.createTextNode(c.label));
@@ -273,9 +273,9 @@
     if (!name) { setStatus("bad", "The shopping list needs a name."); return; }
     state.extras.push({ name: name, unit: "" });
     els.extraName.value = "";
-    persist();
+    var saved = persist();
     renderShopping();
-    setStatus("ok", name + " added to the shopping list by hand.");
+    if (saved) setStatus("ok", name + " added to the shopping list by hand.");
   });
   els.exportPantry.addEventListener("click", function () {
     doExport("pantry", { items: state.items, extras: state.extras, todayMs: todayMs() });
